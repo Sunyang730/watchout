@@ -1,7 +1,12 @@
+var height = 250;
+var width = 250;
+
+
+
 //** Create container for the circle.
 var container = d3.select('body').append('svg')
-                  .attr('width', 250 + 'px')
-                  .attr('height', 250 + 'px');
+                  .attr('width', width + 'px')
+                  .attr('height', height + 'px');
 
 // ** Player node
 var playerNode = d3.select('svg').append('circle')
