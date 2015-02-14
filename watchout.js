@@ -5,16 +5,28 @@ var width = 250;
 
 //** Create container for the circle.
 var container = d3.select('body').append('svg')
-                  .attr('width', width + 'px')
-                  .attr('height', height + 'px');
+  .attr('class', 'container')
+  .attr('width', width + 'px')
+  .attr('height', height + 'px');
+
+// ** drag class constructor
+var drag = d3.behavior.drag()
+  .origin(function(d){return d;})
+  .on("drag", function(d){ return dragged(d);});
+
 
 // ** Player node
-var playerNode = d3.select('svg').append('circle')
-                .attr('class', 'playerNode')
-                .attr('r', '5')
-                .attr('fill', 'black')
-                .attr('cx', 100)
-                .attr('cy', 100);
+var playerNode = container.selectAll('.playerNode')
+  .data([{x: 100, y:100}])
+  .enter()
+  .append('circle')
+  .attr('class', 'playerNode')
+  .attr('r', '5')
+  .attr('fill', 'black')
+  .attr('cx', function(d){ return d.x;})
+  .attr('cy', function(d){ return d.y;})
+  .call(drag);
+
 
 // ** Create/Update circles
 var updateCirclePos = function(circlePos, data){
@@ -69,10 +81,12 @@ var circlePos = function(value){
   return list;
 };
 
-// playerNode.on('drag', function(){
-//   var mousePos = d3.mouse(this);
-//   console.log(mousePos);
-// });
+//** drag fn for playerNode
+var dragged = function(d){
+  playerNode.attr('cx', d3.event.x)
+    .attr('cy', d3.event.y);
+
+};
 
 // ** Initialize the first set of circles
 var circleArray = [];
