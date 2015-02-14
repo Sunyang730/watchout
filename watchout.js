@@ -3,15 +3,6 @@ var container = d3.select('body').append('svg')
                   .attr('width', 250 + 'px')
                   .attr('height', 250 + 'px');
 
-              .append('circle')
-                .attr('class', 'playerNode')
-                .attr('r', '5')
-                .attr('fill', 'black')
-                .attr('cx', 100)
-                .attr('cy', 100);
-
-// ** player node
-
 
 // ** Create/Update circles
 var updateCirclePos = function(circlePos, data){
@@ -63,6 +54,16 @@ var circlePos = function(value){
 var currentScore = function(value){
 
 };
+
+// ** Player node
+
+d3.select('svg').append('circle')
+                .attr('class', 'playerNode')
+                .attr('r', '5')
+                .attr('fill', 'black')
+                .attr('cx', 100)
+                .attr('cy', 100);
+
 
 // ** Initialize the first set of circles
 var circleArray = [];
