@@ -14,13 +14,13 @@ var updateCirclePos = function(circlePos, data){
   var circle = container.selectAll('span')
       .data(data);
   //** Update circle position.
-  circle.style('top', function(d,i){
+  circle.transition().duration(500)
+      .style('top', function(d,i){
         return circlePos[0][i] + 'px';
       })
       .style('left', function(d,i){
         return circlePos[1][i] + 'px';
-      })
-      .transition().duration(500);
+      });
 
   //** Create circle at random position.
   circle.enter().append('span')
