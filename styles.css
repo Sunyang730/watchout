@@ -1,5 +1,19 @@
 /* your beautiful css styling goes here! */
-
+.circle {
+  background-color: red;
+  border-radius:50%;
+  width:10px;
+  height:10px;
+  display:inline-block;
+  position: absolute;
+}
+.container {
+  border: 1px solid black;
+  margin: auto 0px;
+  width: 200px;
+  height: 200px;
+  position: fixed;
+}
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
 
