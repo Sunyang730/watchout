@@ -1,15 +1,8 @@
-// start slingin' some d3 here.
-//*** create a general circle with D3
-//
-
+//** Create container for the circle.
 var container = d3.select('body').append('div')
     .attr('class', 'container')
 
-//** Fn that creates circle in the container
-//** Each circle should take a different x and y
-//** After each update the circle will transform to
-//   another position
-//
+// ** Create/Update circles
 var updateCirclePos = function(circlePos, data){
   var circle = container.selectAll('span')
       .data(data);
@@ -32,10 +25,6 @@ var updateCirclePos = function(circlePos, data){
         return circlePos[1][i] + 'px';
       });
 
-
-
-      //data will be the x and y position generate by
-      //the fn.
 
 };
 
