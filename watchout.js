@@ -3,12 +3,23 @@ var container = d3.select('body').append('svg')
                   .attr('width', 250 + 'px')
                   .attr('height', 250 + 'px');
 
+              .append('circle')
+                .attr('class', 'playerNode')
+                .attr('r', '5')
+                .attr('fill', 'black')
+                .attr('cx', 100)
+                .attr('cy', 100);
+
+// ** player node
+
+
 // ** Create/Update circles
 var updateCirclePos = function(circlePos, data){
-  var circle = container.selectAll('circle')
+  var circle = container.selectAll('.enemyNode')
       .data(data);
   //** Update circle position.
-  circle.transition().duration(500)
+  circle.transition().duration(1000)
+      .attr('class', 'enemyNode')
       .attr('r', '5')
       .attr('fill', 'red')
       .attr('cx', function(d,i){
@@ -20,8 +31,9 @@ var updateCirclePos = function(circlePos, data){
 
   //** Create circle at random position.
   circle.enter().append('circle')
+      .attr('class', 'enemyNode')
       .attr('r', '5')
-      .attr('fill', 'black')
+      .attr('fill', 'red')
       .attr('cx', function(d,i){
         return circlePos[0][i] + 'em';
       })
