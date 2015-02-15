@@ -2,9 +2,16 @@
 
 .container {
   display: block;
-  border: 1px solid black;
+  border: 5px solid #bdc3c7;
+  border-radius:5px;
   margin: auto auto;
   position: relative;
+}
+.scoreboard {
+  border: 5px solid #bdc3c7;
+  width: 150px;
+  border-radius:5px;
+
 }
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */

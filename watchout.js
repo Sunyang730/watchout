@@ -1,140 +1,110 @@
-var height = 250;
-var width = 250;
-var collisions = 0;
-var circleArray = [];
-var score = 0;
+// ** Object that contains all settings
+var settings = {
+  m: 600, //max size
+  h: 600, //height
+  w: 600, //width
+  r: 10, //radius
+  ec: 'red', //enemy color
+  pc: 'black', //Player Color
+  n: 10, //number of enemy.
+  d: 100 //duration
+};
+
+var collisionCounter = 0;
 var currentScore = 0;
+var highScore = 0;
 
 
+// ** create random x and random y and pixelate them
 
-//** Create container for the circle.
+var playerLoc = {x: settings.h/2, y: settings.w/2};
+var randomNum = function(){ return (Math.random() * settings.m );};
+var pixelate = function(num){ return num + 'px';};
+var randomX = function(){ return pixelate(randomNum() + settings.r);};
+var randomY = function(){ return pixelate(randomNum() + settings.r);};
+
+// ** Drag
+
+var drag = d3.behavior.drag().on('drag', function(){
+  var loc = d3.mouse(this);
+  playerLoc.x = loc[0];
+  playerLoc.y = loc[1];
+  playerNode.attr('cx', loc[0])
+    .attr('cy', loc[1]);
+});
+
+// ** container
 var container = d3.select('body').append('svg')
+  .style('background-color', '#ecf0f1')
   .attr('class', 'container')
-  .attr('width', width + 'px')
-  .attr('height', height + 'px');
+  .attr('width', pixelate(settings.w))
+  .attr('height', pixelate(settings.h));
 
-// ** drag class constructor
-var drag = d3.behavior.drag()
-  .origin(function(d){return d;})
-  .on("drag", function(d){ return dragged(d);});
-
-
-// ** Player node
-var playerNode = container.selectAll('.playerNode')
-  .data([{x: 100, y:100}])
-  .enter()
-  .append('circle')
+// ** Player
+var playerNode = container.append('circle')
   .attr('class', 'playerNode')
-  .attr('r', '5')
-  .attr('fill', 'black')
-  .attr('cx', function(d){ return d.x;})
-  .attr('cy', function(d){ return d.y;})
+  .attr('r', settings.r)
+  .attr('fill', settings.pc)
+  .attr('cx', pixelate(playerLoc.x))
+  .attr('cy', pixelate(playerLoc.y))
   .call(drag);
 
+// ** Enemy
+var enemyNode = container.selectAll('.enemyNode')
+  .data(d3.range(settings.n))
+  .enter().append('circle')
+  .attr('class', 'enemyNode')
+  .attr('stroke', '#bdc3c7')
+  .attr('stroke-width', '5')
+  .attr('r', settings.r)
+  .attr('fill', settings.ec)
+  .attr('cx', randomX)
+  .attr('cy', randomY);
 
-// ** Create/Update circles
-var updateCirclePos = function(circlePos, data){
-  var circle = container.selectAll('.enemyNode')
-      .data(data);
-  //** Update circle position.
-  circle.transition().duration(1000)
-      .attr('class', 'enemyNode')
-      .attr('r', '5')
-      .attr('fill', 'red')
-      .attr('cx', function(d,i){
-        return (circlePos[0][i]);
-      })
-      .attr('cy', function(d,i){
-        return (circlePos[1][i]);
-      });
-
-  //** Create circle at random position.
-  circle.enter().append('circle')
-      .attr('class', 'enemyNode')
-      .attr('r', '5')
-      .attr('fill', 'red')
-      .attr('cx', function(d,i){
-        return (circlePos[0][i]);
-      })
-      .attr('cy', function(d,i){
-        return (circlePos[1][i]);
-      });
-
-
-};
-// ** Generate scores
-
-var updateScore = function(score){
-  d3.select('.current').select('span').text(score+1);
-  return score+1;
+var setHighScore = function(){
+  highScore = Math.max(currentScore, highScore);
+  currentScore = 0;
 };
 
-//** Generate random number for a given max
-
-var randomNum = function(max){
-  return (Math.random() * max);
+// ** new position of the enemy nodes
+var relocate = function(nodes){
+  nodes.transition().duration(1500)
+    .attr('cx', randomX)
+    .attr('cy', randomY)
+    .each('end', function(){
+      relocate(enemyNode);
+    })
 };
 
-// ** Generate the top and left for circle.
+relocate(enemyNode);
 
-var circlePos = function(value){
-  var list = [];
-  for(var i = 0; i < value; i++){
-    list.push(randomNum(200));
-  }
-  return list;
-};
+// ** Collision Detection
+var detectCollision = function(){
+  var collision = false;
 
-// ** Collision detection
-
-var collision = function(collisions){
-  var edx = 0;
-  var edy = 0;
-
-  container.selectAll('.enemyNode').each(function(d){
-    if(currentScore < score){
-      currentScore = score;
+  enemyNode.each(function(){
+    var enemyX = parseInt(d3.select(this).attr('cx').slice(0, -2)) + settings.r;
+    var enemyY = parseInt(d3.select(this).attr('cy').slice(0, -2)) + settings.r;
+    var x = enemyX - playerLoc.x;
+    var y = enemyY - playerLoc.y;
+    // ** a^2 + b^2 = c^2
+    if(Math.sqrt(x*x + y*y) < settings.r * 2) {
+      collision = true;
+      setHighScore()
     }
-    if(Math.abs(d3.select(this).attr('cx') - playerNode.attr('cx')) <10 && Math.abs(d3.select(this).attr('cy') - playerNode.attr('cy'))<10){
-      d3.select('.collisions').select('span').text(collisions);
-      d3.select('.high').select('span').text(currentScore);
-      score =0;
-      d3.select('.current').select('span').text(score);
-
-    }
-
   });
-
-  return collisions+1;
-
-};
-//** drag fn for playerNode also check for collision if cx and cy match
-var dragged = function(d){
-  playerNode.attr('cx', d3.event.x)
-    .attr('cy', d3.event.y);
+  if(collision){
+    collisionCounter += 1;
+  }
 };
 
-// ** time to detect collision
+d3.timer(detectCollision);
+
+// ** update the text.
 setInterval(function(){
-  collisions += collision(collisions);
-}, 1000);
-
-// ** Initialize the first set of circles
-circleArray.push(circlePos(10));
-circleArray.push(circlePos(10));
-updateCirclePos(circleArray, Array(10));
-
-
-
-
-//** Generate the next set of circles
-setInterval(function(){
-  var circleArray = [];
-  circleArray.push(circlePos(10));
-  circleArray.push(circlePos(10));
-  updateCirclePos(circleArray, Array(10));
-  score = updateScore(score);
-}, 1500);
-
-
+  currentScore += 1;
+  d3.select('.collisions').select('span').text(collisionCounter);
+  d3.select('.high').select('span').text(highScore);
+  d3.select('.current').select('span').text(currentScore);
+}, settings.d)
 
